@@ -1,0 +1,9 @@
+name: LootManager
+version: '${project.version}'
+main: org.dimasik.lootmanager.LootManager
+api-version: '1.16'
+commands:
+  lootmanager:
+    aliases:
+      - lm
+    permission: lootmanager.gui
