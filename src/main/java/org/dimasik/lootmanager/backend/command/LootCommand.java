@@ -1,20 +1,18 @@
 package org.dimasik.lootmanager.backend.command;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.dimasik.lootmanager.LootManager;
 import org.dimasik.lootmanager.backend.utils.Parser;
 import org.dimasik.lootmanager.frontend.menus.Main;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class LootCommand implements CommandExecutor, TabCompleter {
     private final LootManager plugin;
@@ -32,7 +30,8 @@ public class LootCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             Player player = (Player) sender;
-            new Main(1).setCurrentCategory("Все подряд").setCurrentFilterLevel(0).setPlayer((Player) sender).compile().open();
+            new Main(1).setCurrentCategory("Все подряд").setCurrentFilterLevel(0).setPlayer(player)
+                    .compileAsync().thenAccept(Main::openAsync);
             return true;
         }
 
@@ -77,14 +76,18 @@ public class LootCommand implements CommandExecutor, TabCompleter {
 
         plugin.getDatabaseManager().saveConfig(name, configData)
                 .thenAccept(success -> {
-                    if (success) {
-                        sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7успешно загружена!"));
-                    } else {
-                        sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при загрузке конфигурации"));
-                    }
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        if (success) {
+                            sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7успешно загружена!"));
+                        } else {
+                            sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при загрузке конфигурации"));
+                        }
+                    });
                 })
                 .exceptionally(e -> {
-                    sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при загрузке: &#FF2222" + e.getMessage()));
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при загрузке: &#FF2222" + e.getMessage()));
+                    });
                     return null;
                 });
     }
@@ -92,22 +95,26 @@ public class LootCommand implements CommandExecutor, TabCompleter {
     private void downloadConfig(CommandSender sender, String name) {
         plugin.getDatabaseManager().getConfig(name)
                 .thenAccept(configData -> {
-                    if (configData != null) {
-                        try {
-                            plugin.getItemManager().clearItems();
-                            plugin.getItemsConfig().loadFromString(configData);
-                            plugin.saveItemsConfig();
-                            plugin.getItemManager().loadItems();
-                            sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7успешно скачана!"));
-                        } catch (org.bukkit.configuration.InvalidConfigurationException e) {
-                            sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка формата конфигурации"));
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        if (configData != null) {
+                            try {
+                                plugin.getItemManager().clearItems();
+                                plugin.getItemsConfig().loadFromString(configData);
+                                plugin.saveItemsConfig();
+                                plugin.getItemManager().loadItems();
+                                sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7успешно скачана!"));
+                            } catch (org.bukkit.configuration.InvalidConfigurationException e) {
+                                sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка формата конфигурации"));
+                            }
+                        } else {
+                            sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7не найдена."));
                         }
-                    } else {
-                        sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7не найдена."));
-                    }
+                    });
                 })
                 .exceptionally(e -> {
-                    sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при скачивании: &#FF2222" + e.getMessage()));
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при скачивании: &#FF2222" + e.getMessage()));
+                    });
                     return null;
                 });
     }
@@ -115,14 +122,18 @@ public class LootCommand implements CommandExecutor, TabCompleter {
     private void deleteConfig(CommandSender sender, String name) {
         plugin.getDatabaseManager().deleteConfig(name)
                 .thenAccept(success -> {
-                    if (success) {
-                        sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7успешно удалена!"));
-                    } else {
-                        sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Конфигурация &#FF2222" + name + " &#E7E7E7не найдена."));
-                    }
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        if (success) {
+                            sender.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + name + " &#E7E7E7успешно удалена!"));
+                        } else {
+                            sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Конфигурация &#FF2222" + name + " &#E7E7E7не найдена."));
+                        }
+                    });
                 })
                 .exceptionally(e -> {
-                    sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при удалении: &#FF2222" + e.getMessage()));
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        sender.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при удалении: &#FF2222" + e.getMessage()));
+                    });
                     return null;
                 });
     }
@@ -143,7 +154,7 @@ public class LootCommand implements CommandExecutor, TabCompleter {
                 completions.addAll(configNames);
             }
             catch (Exception e){
-                throw new RuntimeException(e);
+                // Tab completion is synchronous by design, just return empty if async fails
             }
         }
         return completions;

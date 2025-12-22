@@ -1,16 +1,12 @@
 package org.dimasik.lootmanager.frontend.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.dimasik.lootmanager.LootManager;
 import org.dimasik.lootmanager.backend.models.LootItem;
 import org.dimasik.lootmanager.backend.utils.Parser;
@@ -18,7 +14,6 @@ import org.dimasik.lootmanager.frontend.menus.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MainListener implements Listener {
@@ -52,7 +47,7 @@ public class MainListener implements Listener {
                 new Properties(5, 1, main).setPlayer(player).compile().open();
             }
             else if (slot == 46) {
-                new Configs(1, main).setPlayer(player).compile().open();
+                new Configs(1, main).setPlayer(player).compileAsync().thenAccept(Configs::openAsync);
             }
             else if (slot == 47) {
                 player.sendMessage(Parser.color("&#00D4FB▶ &fПредметы обновлены."));
@@ -73,7 +68,7 @@ public class MainListener implements Listener {
                 Main newMain = new Main(newPage);
                 newMain.setCurrentFilterLevel(main.getCurrentFilterLevel());
                 newMain.setCurrentCategory(main.getCurrentCategory());
-                newMain.setPlayer(player).compile().open();
+                newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
             }
             else if (slot == 48) {
                 int newPage = main.getPage() - 1;
@@ -93,7 +88,7 @@ public class MainListener implements Listener {
                     Main newMain = new Main(newPage);
                     newMain.setCurrentFilterLevel(main.getCurrentFilterLevel());
                     newMain.setCurrentCategory(main.getCurrentCategory());
-                    newMain.setPlayer(player).compile().open();
+                    newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                 }
             } else if (slot == 50) {
                 int newPage = main.getPage() + 1;
@@ -113,7 +108,7 @@ public class MainListener implements Listener {
                     Main newMain = new Main(newPage);
                     newMain.setCurrentFilterLevel(main.getCurrentFilterLevel());
                     newMain.setCurrentCategory(main.getCurrentCategory());
-                    newMain.setPlayer(player).compile().open();
+                    newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                 }
             } else if (slot == 52) {
                 int newPage = main.getPage();
@@ -133,20 +128,20 @@ public class MainListener implements Listener {
                 if (event.isLeftClick()) {
                     if (event.isShiftClick()) {
                         newMain.setCurrentFilterLevel(0);
-                        newMain.setPlayer(player).compile().open();
+                        newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                     } else {
                         int newLevel = main.getCurrentFilterLevel() + 1;
                         if (newLevel > 100) newLevel = 1;
                         newMain.setCurrentFilterLevel(newLevel);
-                        newMain.setPlayer(player).compile().open();
+                        newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                     }
                 } else if (event.isRightClick()) {
                     int newLevel = main.getCurrentFilterLevel() - 1;
                     if (newLevel < 0) newLevel = 100;
                     newMain.setCurrentFilterLevel(newLevel);
-                    newMain.setPlayer(player).compile().open();
+                    newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                 }
             } else if (slot == 53) {
@@ -166,12 +161,12 @@ public class MainListener implements Listener {
                 newMain.setCurrentFilterLevel(main.getCurrentFilterLevel());
                 if(event.isLeftClick()){
                     newMain.setCurrentCategory(getNextCategory(main.getCurrentCategory()));
-                    newMain.setPlayer(player).compile().open();
+                    newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                 }
                 else if(event.isRightClick()){
                     newMain.setCurrentCategory(getPrevCategory(main.getCurrentCategory()));
-                    newMain.setPlayer(player).compile().open();
+                    newMain.setPlayer(player).compileAsync().thenAccept(Main::openAsync);
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                 }
             }

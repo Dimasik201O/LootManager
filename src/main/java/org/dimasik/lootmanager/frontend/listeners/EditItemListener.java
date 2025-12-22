@@ -6,14 +6,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.dimasik.lootmanager.LootManager;
 import org.dimasik.lootmanager.backend.models.LootItem;
-import org.dimasik.lootmanager.backend.utils.ItemHoverUtil;
 import org.dimasik.lootmanager.backend.utils.Parser;
 import org.dimasik.lootmanager.frontend.menus.EditItem;
 import org.dimasik.lootmanager.frontend.menus.Main;
-import org.dimasik.lootmanager.frontend.menus.RemoveItem;
 
 public class EditItemListener implements Listener {
     @EventHandler
@@ -113,7 +110,7 @@ public class EditItemListener implements Listener {
             }
             else if(slot == 21){
                 Main back = editItem.getBack();
-                back.compile().open();
+                back.compileAsync().thenAccept(Main::openAsync);
             }
             else if(slot == 23){
                 player.sendMessage(Parser.color("&#00D4FB▶ &fПредмет сохранен."));

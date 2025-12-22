@@ -7,7 +7,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.dimasik.lootmanager.LootAPI;
-import org.dimasik.lootmanager.LootManager;
 import org.dimasik.lootmanager.frontend.menus.*;
 
 public class PropertiesListener implements Listener {
@@ -67,7 +66,7 @@ public class PropertiesListener implements Listener {
             }
             else if(slot == 4){
                 Main back = properties.getBack();
-                back.compile().open();
+                back.compileAsync().thenAccept(Main::openAsync);
             }
         }
     }

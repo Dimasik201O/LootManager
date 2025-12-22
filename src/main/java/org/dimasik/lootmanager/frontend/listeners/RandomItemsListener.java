@@ -8,13 +8,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.dimasik.lootmanager.LootAPI;
-import org.dimasik.lootmanager.LootManager;
-import org.dimasik.lootmanager.backend.models.LootItem;
 import org.dimasik.lootmanager.frontend.menus.Main;
 import org.dimasik.lootmanager.frontend.menus.Properties;
 import org.dimasik.lootmanager.frontend.menus.RandomItems;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RandomItemsListener implements Listener {
@@ -31,7 +28,7 @@ public class RandomItemsListener implements Listener {
             int slot = event.getSlot();
             if(slot == 45){
                 Main main = randomItems.getBack();
-                main.compile().open();
+                main.compileAsync().thenAccept(Main::openAsync);
             }
             else if(slot == 48){
                 int newPage = randomItems.getPage() - 1;

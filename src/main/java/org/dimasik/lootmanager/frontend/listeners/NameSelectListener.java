@@ -1,6 +1,5 @@
 package org.dimasik.lootmanager.frontend.listeners;
 
-import net.minecraft.server.v1_16_R3.CancelledPacketHandleException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,7 +16,6 @@ import org.dimasik.lootmanager.LootManager;
 import org.dimasik.lootmanager.backend.models.NameData;
 import org.dimasik.lootmanager.backend.utils.PacketSender;
 import org.dimasik.lootmanager.backend.utils.Parser;
-import org.dimasik.lootmanager.frontend.menus.Config;
 import org.dimasik.lootmanager.frontend.menus.Configs;
 import org.dimasik.lootmanager.frontend.menus.NameSelect;
 
@@ -37,7 +35,7 @@ public class NameSelectListener implements Listener {
             if(!nameData.getForceClose()){
                 Bukkit.getScheduler().runTaskLater(LootManager.getInstance(), () -> {
                     if(event.getPlayer() != null) {
-                        nameData.getBack().compile().open();
+                        nameData.getBack().compileAsync().thenAccept(Configs::openAsync);
                     }
                 }, 1);
             }
@@ -122,21 +120,21 @@ public class NameSelectListener implements Listener {
                     String configData = LootManager.getInstance().getItemsConfig().saveToString();
                     LootManager.getInstance().getDatabaseManager().saveConfig(name, configData)
                             .thenAccept(success -> {
-                                if (success) {
-                                    player.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + finalName + " &#E7E7E7успешно загружена!"));
-                                } else {
-                                    player.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при загрузке конфигурации"));
-                                }
                                 Bukkit.getScheduler().runTask(LootManager.getInstance(), () -> {
+                                    if (success) {
+                                        player.sendMessage(Parser.color("&#00D4FB▶ &#E7E7E7Конфигурация &#00D4FB" + finalName + " &#E7E7E7успешно загружена!"));
+                                    } else {
+                                        player.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при загрузке конфигурации"));
+                                    }
                                     Configs configs = nameData.getBack();
-                                    configs.compile().open();
+                                    configs.compileAsync().thenAccept(Configs::openAsync);
                                 });
                             })
                             .exceptionally(e -> {
                                 Bukkit.getScheduler().runTask(LootManager.getInstance(), () -> {
                                     player.sendMessage(Parser.color("&#FF2222▶ &#E7E7E7Ошибка при удалении: &#FF2222" + e.getMessage()));
                                     Configs configs = nameData.getBack();
-                                    configs.compile().open();
+                                    configs.compileAsync().thenAccept(Configs::openAsync);
                                 });
                                 return null;
                             });

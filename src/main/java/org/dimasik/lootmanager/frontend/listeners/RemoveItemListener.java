@@ -13,8 +13,6 @@ import org.dimasik.lootmanager.backend.utils.Parser;
 import org.dimasik.lootmanager.frontend.menus.Main;
 import org.dimasik.lootmanager.frontend.menus.RemoveItem;
 
-import java.util.Optional;
-
 public class RemoveItemListener implements Listener {
     @EventHandler
     public void on(InventoryClickEvent event){
@@ -48,7 +46,7 @@ public class RemoveItemListener implements Listener {
                     LootManager.getInstance().getItemManager().removeItem(removeItem.getLootItem().getId());
 
                     Main main = removeItem.getBack();
-                    main.compile().open();
+                    main.compileAsync().thenAccept(Main::openAsync);
                     break;
                 case 6:
                 case 7:
@@ -60,7 +58,7 @@ public class RemoveItemListener implements Listener {
                 case 25:
                 case 26:
                     Main back = removeItem.getBack();
-                    back.compile().open();
+                    back.compileAsync().thenAccept(Main::openAsync);
                     break;
             }
         }
