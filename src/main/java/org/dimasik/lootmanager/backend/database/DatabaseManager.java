@@ -35,7 +35,7 @@ public class DatabaseManager {
                     stmt.execute(createTableQuery);
                 }
             } catch (SQLException e) {
-                System.err.println("Ошибка при инициализации базы данных: " + e.getMessage());
+                throw new RuntimeException("Ошибка при инициализации базы данных: " + e.getMessage());
             }
         }, executorService);
     }
@@ -52,8 +52,7 @@ public class DatabaseManager {
                     return true;
                 }
             } catch (SQLException e) {
-                System.err.println("Ошибка при сохранении конфигурации: " + e.getMessage());
-                return false;
+                throw new RuntimeException("Ошибка при сохранении конфигурации: " + e.getMessage());
             }
         }, executorService);
     }
@@ -70,7 +69,7 @@ public class DatabaseManager {
                     }
                 }
             } catch (SQLException e) {
-                System.err.println("Ошибка при получении конфигурации: " + e.getMessage());
+                throw new RuntimeException("Ошибка при получении конфигурации: " + e.getMessage());
             }
             return null;
         }, executorService);
@@ -86,8 +85,7 @@ public class DatabaseManager {
                     return affectedRows > 0;
                 }
             } catch (SQLException e) {
-                System.err.println("Ошибка при удалении конфигурации: " + e.getMessage());
-                return false;
+                throw new RuntimeException("Ошибка при удалении конфигурации: " + e.getMessage());
             }
         }, executorService);
     }
@@ -104,7 +102,7 @@ public class DatabaseManager {
                     }
                 }
             } catch (SQLException e) {
-                System.err.println("Ошибка при получении списка конфигураций: " + e.getMessage());
+                throw new RuntimeException("Ошибка при получении списка конфигураций: " + e.getMessage());
             }
             return configNames;
         }, executorService);
